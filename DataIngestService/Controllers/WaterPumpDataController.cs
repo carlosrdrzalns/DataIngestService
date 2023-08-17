@@ -20,14 +20,13 @@ namespace DataIngestService.Controllers
         }
         [HttpPost]
         [Route("waterpumpcontroller/postData")]
-        public async Task<IActionResult> postData(string jsonData)
+        public async Task<IActionResult> postData([FromBody]WaterPumpData jsonData)
         {
             try
-            {
-                WaterPumpData data = Newtonsoft.Json.JsonConvert.DeserializeObject<WaterPumpData>(jsonData);
-                data.Id = Guid.NewGuid();
-                data.timestamp = DateTime.UtcNow;
-                ctx.WaterPumpData.Add(data);
+            {                
+                jsonData.Id = Guid.NewGuid();
+                jsonData.timestamp = DateTime.UtcNow;
+                ctx.WaterPumpData.Add(jsonData);
                 await ctx.SaveChangesAsync();
                 return Ok();
             }catch(System.Exception exp)
@@ -42,17 +41,18 @@ namespace DataIngestService.Controllers
         {
             List<WaterPumpData> waterPumpDatas = new List<WaterPumpData>();
             waterPumpDatas = this.ctx.WaterPumpData.OrderByDescending(wd => wd.timestamp).Take(nElements).ToList();
+            waterPumpDatas = waterPumpDatas.OrderBy(x => x.timestamp).ToList();
             return waterPumpDatas;
         }
 
         [HttpPost]
         [Route("waterpumpcontroller/postPredictions")]
-        public async Task<IActionResult> postPredictions(string jsonData)
+        public async Task<IActionResult> postPredictions([FromBody] WaterPumpStatusPredictions jsonData)
         {
             try
             {
-                WaterPumpStatusPredictions data = Newtonsoft.Json.JsonConvert.DeserializeObject<WaterPumpStatusPredictions>(jsonData);
-                ctx.WaterPumpStatusPredictions.Add(data);
+                jsonData.Id = Guid.NewGuid();
+                ctx.WaterPumpStatusPredictions.Add(jsonData);
                 await ctx.SaveChangesAsync();
                 return Ok();
             }
@@ -61,6 +61,16 @@ namespace DataIngestService.Controllers
                 return NotFound(exp);
             }
         }
+
+        [HttpGet]
+        [Route("waterpumpcontroller/getPredictions")]
+        public List<WaterPumpStatusPredictions> getPredictions(int nElements)
+        {
+            List<WaterPumpStatusPredictions> waterPumpDatas = new List<WaterPumpStatusPredictions>();
+            waterPumpDatas = this.ctx.WaterPumpStatusPredictions.OrderByDescending(wd => wd.timestamp).Take(nElements).ToList();
+            return waterPumpDatas;
+        }
+
 
 
     }

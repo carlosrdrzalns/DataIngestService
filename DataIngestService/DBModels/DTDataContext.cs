@@ -16,5 +16,7 @@ namespace DataIngestService.DBModels
         public DbSet<WaterPumpData> WaterPumpData { get; set; }
 
         public DbSet<WaterPumpStatusPredictions> WaterPumpStatusPredictions { get; set; }
+
+        public DbSet<BiologicalReactorData> BiologicalReactorData { get; set; }
     }
 }
